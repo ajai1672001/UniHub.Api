@@ -1,0 +1,6 @@
+@UniHub.Api_HostAddress = http://localhost:5213
+
+GET {{UniHub.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
