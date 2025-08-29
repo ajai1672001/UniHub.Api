@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UniHub.Infrastructure;
+using UniHub.Service;
 namespace UniHub.Api; 
 public class Program 
 {
@@ -15,6 +16,9 @@ public class Program
         #endregion
 
         builder.Services.AddControllers();
+
+        builder.Services.AddServices();
+
         var app = builder.Build();
 
         #region Configure Middleware 

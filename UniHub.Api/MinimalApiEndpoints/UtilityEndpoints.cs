@@ -1,16 +1,19 @@
-﻿namespace UniHub.Api.MinimalApiEndpoints
+﻿using UniHub.Service.Interfaces;
+
+namespace UniHub.Api.MinimalApiEndpoints
 {
     public static class UtilityEndpoints
     {
         public static void MapUtilityEndpoints(this IEndpointRouteBuilder app)
         {
             app.MapGet("/ping", () => Results.Ok("Pong ✅"))
-               .WithName("Ping")
-               .WithTags("Utility");
+          .WithName("Ping")
+          .WithTags("Utility");
 
-            app.MapGet("/time", () =>
+            app.MapGet("/time", (ITimeService timeService) =>
             {
-                return Results.Ok(new { ServerTime = DateTime.UtcNow });
+                var time = timeService.GetCurrentTime();
+                return Results.Ok(new { ServerTime = time });
             })
             .WithName("ServerTime")
             .WithTags("Utility");
