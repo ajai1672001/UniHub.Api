@@ -33,6 +33,10 @@ public class Program
         app.MapControllers();
         #endregion
 
+        #region Minimal API Endpoints
+        app.RegisterMinimalApis();
+        #endregion
+
         app.Run();
     } 
 }
