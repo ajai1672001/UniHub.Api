@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using UniHub.Api.Extension.Middleware;
 using UniHub.Api.Extenstion;
 using UniHub.Infrastructure;
 using UniHub.Service;
@@ -62,6 +63,10 @@ public class Program
         #endregion
 
         #region Middleware Pipeline
+
+        // Error handling
+        app.UseMiddleware<ErrorHandlingMiddleware>();
+        
         // Enforces HTTPS redirection for secure requests.
         app.UseHttpsRedirection();
 

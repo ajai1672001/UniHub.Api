@@ -19,7 +19,7 @@ namespace UniHub.Service.Services
         {
             _emailLogger.Information("📧 Email sent to {Recipient}", "Ajith");
             _appleLogger.Information("🍎 Apple service executed at {Time}", DateTime.UtcNow);
-
+            throw new ApplicationException("error");
             return DateTime.UtcNow;
         }
     }

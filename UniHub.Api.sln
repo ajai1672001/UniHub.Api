@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniHub.Service", "UniHub.Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniHub.Infrastructure", "UniHub.Infrastructure\UniHub.Infrastructure.csproj", "{08DED91A-01B1-4F36-86AE-F51BE56F7318}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniHub.Dto", "UniHub.Dto\UniHub.Dto.csproj", "{9AAE1D22-F4D5-4FB5-8212-1621D61C25BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{08DED91A-01B1-4F36-86AE-F51BE56F7318}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08DED91A-01B1-4F36-86AE-F51BE56F7318}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08DED91A-01B1-4F36-86AE-F51BE56F7318}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AAE1D22-F4D5-4FB5-8212-1621D61C25BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AAE1D22-F4D5-4FB5-8212-1621D61C25BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AAE1D22-F4D5-4FB5-8212-1621D61C25BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AAE1D22-F4D5-4FB5-8212-1621D61C25BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
