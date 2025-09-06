@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace UniHub.Entities
+namespace UniHub.Domain.Entities.Identity
 {
     public class AspNetRole : IdentityRole<Guid>
     {
@@ -8,7 +8,7 @@ namespace UniHub.Entities
 
         public Guid? TenantId { get; set; }
 
-        public DateTime CreatedDate { get; set; }   
+        public DateTime CreatedDate { get; set; }
 
         public bool IsDeleted { get; set; }
     }

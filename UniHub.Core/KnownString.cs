@@ -8,6 +8,5 @@
             public const string Tenant = "tenant";
             public const string Identity = "identity";
         }
-
     }
 }

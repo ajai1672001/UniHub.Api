@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UniHub.Core\UniHub.Core.csproj" />
-    <ProjectReference Include="..\UniHub.Entities\UniHub.Entities.csproj" />
+    <ProjectReference Include="..\UniHub.Domain\UniHub.Domain.csproj" />
   </ItemGroup>
 
 </Project>

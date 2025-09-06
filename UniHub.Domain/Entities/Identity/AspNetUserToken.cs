@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace UniHub.Entities
+namespace UniHub.Domain.Entities.Identity
 {
     public class AspNetUserToken : IdentityUserToken<Guid>
     {

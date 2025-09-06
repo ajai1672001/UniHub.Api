@@ -1,4 +1,4 @@
-﻿namespace UniHub.Entities
+﻿namespace UniHub.Domain.Entities.Identity
 {
     public class UserOtp : BaseSoftDeleteIdEntity<Guid>
     {

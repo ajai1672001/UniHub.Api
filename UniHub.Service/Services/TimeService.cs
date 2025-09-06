@@ -1,6 +1,5 @@
 ﻿using Serilog;
-using System;
-using UniHub.Service.Interfaces;
+using UniHub.Domain.Interface;
 
 namespace UniHub.Service.Services
 {

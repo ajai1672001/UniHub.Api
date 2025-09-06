@@ -62,7 +62,7 @@ namespace UniHub.Api.Extension.Middleware
         {
             // 🔹 log to Serilog
             Serilog.Log.ForContext("LogType", "Error")
-                       .Error(ex, "Unhandled exception caught by middleware. "+ex.Message);
+                       .Error(ex, "Unhandled exception caught by middleware. " + ex.Message);
 
             _logger.LogError(ex, message);
 
@@ -83,6 +83,5 @@ namespace UniHub.Api.Extension.Middleware
 
             await context.Response.WriteAsJsonAsync(errorResponse);
         }
-
     }
 }

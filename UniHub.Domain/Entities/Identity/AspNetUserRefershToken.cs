@@ -1,4 +1,4 @@
-﻿namespace UniHub.Entities
+﻿namespace UniHub.Domain.Entities.Identity
 {
     public class AspNetUserRefershToken : BaseSoftDeleteIdEntity<Guid>
     {

@@ -1,6 +1,6 @@
-﻿using UniHub.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using UniHub.Domain.Entities;
 using static UniHub.Core.KnownString;
 
 namespace UniHub.Infrastruture.Configurations
@@ -9,7 +9,6 @@ namespace UniHub.Infrastruture.Configurations
     {
         public void Configure(EntityTypeBuilder<Tenant> builder)
         {
-
             builder.ToTable("Tenants", Schema.Tenant);
 
             builder
@@ -17,6 +16,11 @@ namespace UniHub.Infrastruture.Configurations
                 .HasMaxLength(100)
                 .IsRequired()
                 .IsUnicode(true);
+
+            builder
+                .Property(e => e.TimeZone)
+                .HasMaxLength(100)
+                .IsRequired();
         }
     }
 }
