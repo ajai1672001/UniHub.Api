@@ -1,13 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
 using UniHub.Domain.Entities;
+using UniHub.Domain.Entities.Identity;
 using UniHub.Domain.Interface;
 using UniHub.Infrastructure.Configurations;
 
 namespace UniHub.Infrastructure;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<
+        AspNetUser,
+        AspNetRole,
+        Guid,
+        AspNetUserClaim,
+        AspNetUserRole,
+        AspNetUserLogin,
+        AspNetRoleClaim,
+        AspNetUserToken>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
@@ -23,7 +34,7 @@ public class ApplicationDbContext : DbContext
     {
         var configurations = Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.Namespace == "UniHub.Infrastruture.Configurations" &&
+            .Where(t => t.Namespace == "UniHub.Infrastructure.Configurations" &&
                         t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)));
 
         foreach (var configuration in configurations)
@@ -51,19 +62,38 @@ public class ApplicationDbContext : DbContext
                 BaseConfiguration.ConfigureBaseEntity(builder);
             }
 
-            if (typeof(IHaveBaseSoftDeleteAuditService).IsAssignableFrom(clrType))
+            if (typeof(IHaveBaseSoftDeleteService).IsAssignableFrom(clrType))
             {
                 BaseConfiguration.ConfigureSoftDeleteAudit(builder);
             }
 
-            if (typeof(IHaveBaseSoftDeleteAuditService).IsAssignableFrom(clrType))
+            if (typeof(IHaveUserIdEntityService).IsAssignableFrom(clrType))
             {
-                BaseConfiguration.ConfigureSoftDeleteAudit(builder);
+                BaseConfiguration.ConfigureUserIdEntity(builder);
+            }
+
+            if (typeof(IHaveBaseTenantSoftDeleteIdAuditEntityService).IsAssignableFrom(clrType))
+            {
+                BaseConfiguration.ConfigureTenantSoftDeleteIdAuditEntity(builder);
+            }
+
+            if (typeof(IHaveTenantUserIdEntityService).IsAssignableFrom(clrType))
+            {
+                BaseConfiguration.ConfigureTenantUserEntity(builder);
             }
         }
     }
 
     // ✅ Only keep custom tables
     public DbSet<Tenant> Tenants { get; set; }
-    public DbSet<Sample> Samples { get; set; }
+    public DbSet<TenantUser> TenantUsers { get; set; }
+    public DbSet<AspNetRole> AspNetRoles { get; set; }
+    public DbSet<AspNetRoleClaim> AspNetRoleClaims   { get; set; }
+    public DbSet<AspNetUser> AspNetUsers { get; set; }
+    public DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
+    public DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
+    public DbSet<AspNetUserRefershToken> AspNetUserRefershTokens { get; set; }
+    public DbSet<AspNetUserRole> AspNetUserRole { get; set; }
+    public DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
+    public DbSet<UserOtp> UserOtps { get; set; }
 }

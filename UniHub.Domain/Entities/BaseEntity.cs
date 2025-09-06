@@ -13,7 +13,7 @@ namespace UniHub.Domain.Entities
         public T Id { get; set; }
     }
 
-    public class BaseSoftDeleteAuditEntity : BaseAuditEntity, IHaveBaseSoftDeleteAuditService
+    public class BaseSoftDeleteAuditEntity : BaseAuditEntity, IHaveBaseSoftDeleteService
     {
         public bool IsDeleted { get; set; }
     }

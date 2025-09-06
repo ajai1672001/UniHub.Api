@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using UniHub.Domain.Entities;
 using static UniHub.Core.KnownString;
 
-namespace UniHub.Infrastruture.Configurations
+namespace UniHub.Infrastructure.Configurations
 {
     public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
     {
