@@ -1,4 +1,4 @@
-﻿using UniHub.Service.Interfaces;
+﻿using UniHub.Domain.Interface;
 
 namespace UniHub.Api.MinimalApiEndpoints
 {

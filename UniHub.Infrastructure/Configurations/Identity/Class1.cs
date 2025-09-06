@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UniHub.Service.Interfaces
+namespace UniHub.Infrastructure.Configurations.Identity
 {
-    public interface ITimeService
+    internal class Class1
     {
-        DateTime GetCurrentTime();
     }
 }
