@@ -7,12 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
     <PackageReference Include="Serilog" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\UniHub.Domain\UniHub.Domain.csproj" />
+    <ProjectReference Include="..\UniHub.Dto\UniHub.Dto.csproj" />
+    <ProjectReference Include="..\UniHub.Infrastructure\UniHub.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

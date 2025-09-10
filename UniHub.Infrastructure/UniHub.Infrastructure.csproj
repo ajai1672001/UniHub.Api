@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\UniHub.Core\UniHub.Core.csproj" />
     <ProjectReference Include="..\UniHub.Domain\UniHub.Domain.csproj" />
+    <ProjectReference Include="..\UniHub.Dto\UniHub.Dto.csproj" />
   </ItemGroup>
 
 </Project>
