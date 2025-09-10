@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+﻿using Azure;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Xml;
 using UniHub.Domain.Entities;
 using UniHub.Domain.Entities.Identity;
 using UniHub.Domain.Interface;
@@ -43,7 +45,11 @@ public class ApplicationDbContext : IdentityDbContext<
             modelBuilder.ApplyConfiguration(instance);
         }
     }
-
+    private void ApplyTenantFilter(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Tenant>().HasQueryFilter(e =>  !e.IsDeleted);
+        modelBuilder.Entity<TenantUser>().HasQueryFilter(e => !e.IsDeleted);
+    }
     private void ConfigureEntities(ModelBuilder modelBuilder)
     {
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -51,6 +57,12 @@ public class ApplicationDbContext : IdentityDbContext<
             var clrType = entityType.ClrType;
             var builder = modelBuilder.Entity(clrType);
             var parameter = Expression.Parameter(clrType, "e");
+
+            // Check if TenantId property exists
+            var hasTenantId = clrType.GetProperty("TenantId") != null;
+
+            // Check if IsDeleted property exists
+            var hasIsDeleted = clrType.GetProperty("IsDeleted") != null;
 
             if (typeof(IHaveBaseAuditEntityService).IsAssignableFrom(clrType))
             {
@@ -64,7 +76,7 @@ public class ApplicationDbContext : IdentityDbContext<
 
             if (typeof(IHaveBaseSoftDeleteService).IsAssignableFrom(clrType))
             {
-                BaseConfiguration.ConfigureSoftDeleteAudit(builder);
+                BaseConfiguration.ConfigureSoftDeleteAudit(builder, entityType, parameter);
             }
 
             if (typeof(IHaveUserIdEntityService).IsAssignableFrom(clrType))
@@ -81,6 +93,7 @@ public class ApplicationDbContext : IdentityDbContext<
             {
                 BaseConfiguration.ConfigureTenantUserEntity(builder);
             }
+
         }
     }
 

@@ -46,9 +46,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
@@ -71,6 +69,11 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetRoles_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
@@ -104,9 +107,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
@@ -121,6 +122,11 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetRoleClaims_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.HasIndex("RoleId");
 
@@ -170,9 +176,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasDefaultValue(0);
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -228,6 +232,11 @@ namespace UniHub.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetUsers_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -263,9 +272,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -280,6 +287,11 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetUserClaim_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.HasIndex("UserId");
 
@@ -304,9 +316,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -324,6 +334,11 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetUserLogins_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.HasIndex("UserId");
 
@@ -353,9 +368,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("RefershToken")
                         .IsRequired()
@@ -378,6 +391,11 @@ namespace UniHub.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetUserRefershTokens_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
+
                     b.ToTable("AspNetUserRefershTokens", "identity");
                 });
 
@@ -399,9 +417,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -416,6 +432,11 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetUserRoles_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.HasIndex("RoleId");
 
@@ -443,9 +464,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -460,6 +479,11 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_AspNetUserTokens_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.ToTable("AspNetUserTokens", "identity");
                 });
@@ -483,9 +507,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("Otp")
                         .IsRequired()
@@ -503,6 +525,11 @@ namespace UniHub.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AspNetUserId");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_UserOtps_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.ToTable("UserOtps", "identity");
                 });
@@ -523,9 +550,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -549,6 +574,11 @@ namespace UniHub.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Tenants_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
+
                     b.ToTable("Tenants", "tenant");
                 });
 
@@ -571,9 +601,7 @@ namespace UniHub.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -590,6 +618,11 @@ namespace UniHub.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AspNetUserId");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_TenantUsers_IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("IsDeleted"), false);
 
                     b.HasIndex("TenantId");
 

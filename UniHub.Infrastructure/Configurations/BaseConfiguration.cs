@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Data.Common;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 using UniHub.Domain.Entities;
 using UniHub.Domain.Entities.Identity;
 using UniHub.Domain.Interface;
@@ -32,11 +35,19 @@ public static class BaseConfiguration
                .ValueGeneratedOnAddOrUpdate();
     }
 
-    public static void ConfigureSoftDeleteAudit(EntityTypeBuilder builder)
+    public static void ConfigureSoftDeleteAudit(EntityTypeBuilder builder, IMutableEntityType entityType, ParameterExpression parameter)
     {
-        builder.Property(nameof(IHaveBaseSoftDeleteService.IsDeleted))
-               .HasDefaultValue(false)
-               .IsRequired();
+        var softDeleteProperty = Expression.Property(parameter, nameof(IHaveBaseSoftDeleteService.IsDeleted));
+
+        builder.Property(nameof(IHaveBaseSoftDeleteService.IsDeleted)).IsRequired();
+        builder.HasIndex(nameof(IHaveBaseSoftDeleteService.IsDeleted))
+               .IsClustered(false)
+               .HasDatabaseName($"IX_{entityType.GetTableName()}_IsDeleted");
+
+        builder.HasQueryFilter(Expression.Lambda(
+            Expression.Equal(softDeleteProperty, Expression.Constant(false)),
+            parameter
+        ));
     }
 
     public static void ConfigureTenantSoftDeleteIdAuditEntity(EntityTypeBuilder builder)

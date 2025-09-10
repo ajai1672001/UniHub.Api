@@ -1,6 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using UniHub.Domain.Interface;
+using UniHub.Dto;
+using UniHub.Infrastructure;
 using UniHub.Service.Services;
+using Mapster;
 
 namespace UniHub.Service
 {
@@ -10,6 +15,18 @@ namespace UniHub.Service
         {
             services.AddScoped<ITimeService, TimeService>();
             return services;
+        }
+
+        public static IApplicationBuilder UseStaticValues(this IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            var tenant = dbContext.Tenants.IgnoreQueryFilters().Where(e => !e.IsDeleted).AsNoTracking().ToList();
+
+            TenantConfigDto.Tenants = tenant.Adapt<IEnumerable<TenantDto>>();
+
+            return app;
         }
     }
 }
