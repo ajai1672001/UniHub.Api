@@ -23,9 +23,7 @@ public class ApiKeyMiddleware
 
         if (!string.Equals(extractedApiKey, configuredKey))
         {
-            context.Response.StatusCode = 403; // Forbidden
-            await context.Response.WriteAsync("Unauthorized client.");
-            return;
+            throw new UnauthorizedAccessException("API Key was not valid.");
         }
 
         await _next(context);

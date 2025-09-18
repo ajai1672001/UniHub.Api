@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -22,8 +23,18 @@ public class ApplicationDbContext : IdentityDbContext<
         AspNetRoleClaim,
         AspNetUserToken>
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options) { }
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    private readonly IHeaderProvider _headerService;
+    public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options, 
+        IHttpContextAccessor httpContextAccessor, 
+        IHeaderProvider headerService)
+        : base(options)
+    {
+        _httpContextAccessor = httpContextAccessor;
+        _headerService = headerService;
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,9 +58,60 @@ public class ApplicationDbContext : IdentityDbContext<
     }
     private void ApplyTenantFilter(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Tenant>().HasQueryFilter(e =>  !e.IsDeleted);
-        modelBuilder.Entity<TenantUser>().HasQueryFilter(e => !e.IsDeleted);
+        var tenantId = _headerService.TenantId;
+
+        modelBuilder.Entity<Tenant>().HasQueryFilter(e => e.Id == tenantId && !e.IsDeleted );
+        modelBuilder.Entity<TenantUser>().HasQueryFilter(e =>e.TenantId == tenantId && !e.IsDeleted);
     }
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var tenantId = _headerService.TenantId;
+
+        foreach (var item in ChangeTracker.Entries().Where(e => e.Entity is IHaveBaseEntitySerivce))
+        {
+            if (item.State == EntityState.Added)
+            {
+                if (tenantId != Guid.Empty)
+                {
+                    if (item.Entity is IHaveBaseTenantSoftDeleteIdAuditEntityService baseOptionalTenant)
+                    {
+                        baseOptionalTenant.TenantId = tenantId;
+                    }
+                }
+
+                if (item.Entity is BaseSoftDeleteIdEntity<Guid> baseId)
+                {
+                    if (baseId.Id == Guid.Empty)
+                    {
+                        baseId.Id = Guid.NewGuid();
+                    }
+                }
+
+
+                if (item.Entity is IHaveBaseAuditEntityService baseAudit)
+                {
+                    baseAudit.DateCreated = DateTime.UtcNow;
+                }
+
+            }
+            else if (item.State == EntityState.Modified)
+            {
+                if (item.Entity is IHaveBaseAuditEntityService baseAudit)
+                {
+                    baseAudit.DateModified = DateTime.UtcNow;
+                }
+            }
+        }
+        try
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
     private void ConfigureEntities(ModelBuilder modelBuilder)
     {
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

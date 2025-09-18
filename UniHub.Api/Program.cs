@@ -74,6 +74,8 @@ public class Program
         // This allows attribute-based controllers to work (e.g., [ApiController]).
         builder.Services.AddControllers();
 
+        builder.Services.AddHttpContextAccessor();
+
         #endregion Controllers (Traditional API Endpoints)
 
         #region Dependency Injection (Custom Application Services)
@@ -81,6 +83,9 @@ public class Program
         // Extension method to register application-level services
         // Example: repositories, domain services, business logic handlers.
         builder.Services.AddServices();
+
+        // Extension method to register application-level services  for repository and commit
+        builder.Services.AddInfrastructure();
 
         #endregion Dependency Injection (Custom Application Services)
 
@@ -118,6 +123,7 @@ public class Program
 
         // X-Apikey authentication
         app.UseMiddleware<ApiKeyMiddleware>();
+        app.UseMiddleware<TenantMiddleware>();
 
         // Enforces HTTPS redirection for secure requests.
         app.UseHttpsRedirection();
@@ -138,6 +144,6 @@ public class Program
 
         #endregion Minimal API Endpoints
 
-        app.Run();
+        app.Run(); 
     }
 }
