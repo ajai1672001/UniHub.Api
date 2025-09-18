@@ -8,7 +8,6 @@ namespace UniHub.Api.Extension.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ErrorHandlingMiddleware> _logger;
-        private readonly bool _showDetailError;
 
         public ErrorHandlingMiddleware(RequestDelegate next,
             ILogger<ErrorHandlingMiddleware> logger,
@@ -18,7 +17,6 @@ namespace UniHub.Api.Extension.Middleware
             _logger = logger;
 
             // optionally make it configurable from appsettings.json
-            _showDetailError = configuration.GetValue<bool>("AppSettings:ShowDetailError", false);
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -39,21 +37,15 @@ namespace UniHub.Api.Extension.Middleware
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                await HandleExceptionAsync(context, ex, HttpStatusCode.Conflict,
-                    _showDetailError ? ex.Message :
-                    "No data was updated because the information might have changed or been removed since it was last loaded. Please refresh and try again.");
-            }
+                await HandleExceptionAsync(context, ex, HttpStatusCode.Conflict, ex.Message);            }
             catch (UnauthorizedAccessException ex)
             {
-                await HandleExceptionAsync(context, ex, HttpStatusCode.Unauthorized,
-                    _showDetailError ? ex.Message : "Unauthorized request");
+                await HandleExceptionAsync(context, ex, HttpStatusCode.Unauthorized, ex.Message);
             }
             // --- fallback unknown exceptions ---
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex, HttpStatusCode.InternalServerError,
-                    _showDetailError ? ex.Message :
-                    "An unhandled exception occurred while processing the request.");
+                await HandleExceptionAsync(context, ex, HttpStatusCode.InternalServerError, ex.Message );
             }
         }
 

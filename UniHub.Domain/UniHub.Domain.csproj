@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UniHub.Core\UniHub.Core.csproj" />
+    <ProjectReference Include="..\UniHub.Dto\UniHub.Dto.csproj" />
   </ItemGroup>
 
 </Project>

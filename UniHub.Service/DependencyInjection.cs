@@ -14,6 +14,7 @@ namespace UniHub.Service
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<ITimeService, TimeService>();
+            services.AddScoped<ISettingService, SettingService>();
             return services;
         }
 
