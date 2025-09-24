@@ -1,31 +1,22 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using UniHub.Core.Enum;
 using UniHub.Domain.Interface;
 
-namespace UniHub.Domain.Entities.Identity
+namespace UniHub.Domain.Entities.Identity;
+
+public class AspNetUser : IdentityUser<Guid>,
+    IHaveBaseAuditEntityService,
+    IHaveBaseSoftDeleteService,
+    IHaveBaseEntitySerivce
 {
-    public class AspNetUser : IdentityUser<Guid>, IHaveBaseAuditEntityService, IHaveBaseSoftDeleteService, IHaveBaseEntitySerivce
-    {
-        public string FirstName { get; set; } = string.Empty;
+    public bool IsDeleted { get; set; }
 
-        public string LastName { get; set; } = string.Empty;
+    public DateTime DateCreated { get; set; }
 
-        public GenderEnum Gender { get; set; }
+    public DateTime? DateModified { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+    public Guid? CreatedBy { get; set; }
 
-        public string TimeZone { get; set; }
+    public Guid? UpdatedBy { get; set; }
 
-        public bool IsDeleted { get; set; }
-
-        public DateTime DateCreated { get; set; }
-
-        public DateTime? DateModified { get; set; }
-
-        public Guid? CreatedBy { get; set; }
-
-        public Guid? UpdatedBy { get; set; }
-
-        public byte[] RowVersion { get; set; }
-    }
+    public byte[] RowVersion { get; set; }
 }

@@ -1,11 +1,8 @@
-﻿using Azure;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Xml;
 using UniHub.Domain.Entities;
 using UniHub.Domain.Entities.Identity;
 using UniHub.Domain.Interface;
@@ -26,9 +23,10 @@ public class ApplicationDbContext : IdentityDbContext<
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     private readonly IHeaderProvider _headerService;
+
     public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options, 
-        IHttpContextAccessor httpContextAccessor, 
+        DbContextOptions<ApplicationDbContext> options,
+        IHttpContextAccessor httpContextAccessor,
         IHeaderProvider headerService)
         : base(options)
     {
@@ -56,13 +54,15 @@ public class ApplicationDbContext : IdentityDbContext<
             modelBuilder.ApplyConfiguration(instance);
         }
     }
+
     private void ApplyTenantFilter(ModelBuilder modelBuilder)
     {
         var tenantId = _headerService.TenantId;
 
-        modelBuilder.Entity<Tenant>().HasQueryFilter(e => e.Id == tenantId && !e.IsDeleted );
-        modelBuilder.Entity<TenantUser>().HasQueryFilter(e =>e.TenantId == tenantId && !e.IsDeleted);
+        modelBuilder.Entity<Tenant>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<TenantUser>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
     }
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var tenantId = _headerService.TenantId;
@@ -87,12 +87,10 @@ public class ApplicationDbContext : IdentityDbContext<
                     }
                 }
 
-
                 if (item.Entity is IHaveBaseAuditEntityService baseAudit)
                 {
                     baseAudit.DateCreated = DateTime.UtcNow;
                 }
-
             }
             else if (item.State == EntityState.Modified)
             {
@@ -119,12 +117,6 @@ public class ApplicationDbContext : IdentityDbContext<
             var clrType = entityType.ClrType;
             var builder = modelBuilder.Entity(clrType);
             var parameter = Expression.Parameter(clrType, "e");
-
-            // Check if TenantId property exists
-            var hasTenantId = clrType.GetProperty("TenantId") != null;
-
-            // Check if IsDeleted property exists
-            var hasIsDeleted = clrType.GetProperty("IsDeleted") != null;
 
             if (typeof(IHaveBaseAuditEntityService).IsAssignableFrom(clrType))
             {
@@ -155,15 +147,15 @@ public class ApplicationDbContext : IdentityDbContext<
             {
                 BaseConfiguration.ConfigureTenantUserEntity(builder);
             }
-
         }
     }
 
     // ✅ Only keep custom tables
     public DbSet<Tenant> Tenants { get; set; }
+
     public DbSet<TenantUser> TenantUsers { get; set; }
     public DbSet<AspNetRole> AspNetRoles { get; set; }
-    public DbSet<AspNetRoleClaim> AspNetRoleClaims   { get; set; }
+    public DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
     public DbSet<AspNetUser> AspNetUsers { get; set; }
     public DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
     public DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }

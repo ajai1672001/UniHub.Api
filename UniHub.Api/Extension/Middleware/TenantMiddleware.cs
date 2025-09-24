@@ -1,4 +1,6 @@
 ﻿using Mapster;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using UniHub.Core;
 using UniHub.Dto;
 using UniHub.Infrastructure;
@@ -18,7 +20,7 @@ public class TenantMiddleware
     {
         var endpoint = context.GetEndpoint();
 
-        if (endpoint?.Metadata.GetMetadata<SkipTenantMiddlewareAttribute>() != null)
+        if (endpoint?.Metadata.GetMetadata<SkipTenantHeaderAttribute>() != null)
         {
             await _next(context);
             return;
@@ -35,6 +37,16 @@ public class TenantMiddleware
         }
 
         var tenant = TenantConfigDto.Tenants.FirstOrDefault(t => t.Id == tenantId);// soft delete check if you use it
+
+        if (tenant == null)
+        {
+            var tenantList = dbContext.Tenants.IgnoreQueryFilters().Where(e => !e.IsDeleted).AsNoTracking().ToList();
+
+            TenantConfigDto.Tenants = tenantList.Adapt<IEnumerable<TenantDto>>();
+
+            tenant = TenantConfigDto.Tenants.FirstOrDefault(t => t.Id == tenantId);
+        }
+
 
         if (tenant == null)
         {

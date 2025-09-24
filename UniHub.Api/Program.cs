@@ -66,7 +66,12 @@ public class Program
             options.OperationFilter<TenantHeaderOperationFilter>();
         });
 
-        #endregion API Explorer & Swagger (For OpenAPI Documentation)
+
+
+        #endregion API Explorer & Swagger (For OpenAPI Documentation) & x-apikey  & x-tenant-Id
+
+        // Register Identity
+        builder.Services.AddIdentiyConfiguration();
 
         #region Controllers (Traditional API Endpoints)
 
@@ -95,10 +100,9 @@ public class Program
 
         #region GetStaticValues
 
-
         app.UseStaticValues();
 
-        #endregion
+        #endregion GetStaticValues
 
         #region Swagger Middleware (Development Only)
 
@@ -144,6 +148,6 @@ public class Program
 
         #endregion Minimal API Endpoints
 
-        app.Run(); 
+        app.Run();
     }
 }

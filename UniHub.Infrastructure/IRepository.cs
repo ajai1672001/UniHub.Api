@@ -1,9 +1,10 @@
 ﻿using System.Linq.Expressions;
 using UniHub.Domain.Entities;
+using UniHub.Domain.Interface;
 
 namespace UniHub.Infrastructure;
 
-public interface IRepository<T> where T : BaseEntity
+public interface IRepository<T> where T : BaseEntity, IHaveBaseEntitySerivce
 {
     Task<IEnumerable<T>> GetAllAsync();
 
