@@ -6,4 +6,8 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\UniHub.Core\UniHub.Core.csproj" />
+  </ItemGroup>
+
 </Project>

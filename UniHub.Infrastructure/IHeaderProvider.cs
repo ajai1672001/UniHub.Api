@@ -12,5 +12,7 @@ namespace UniHub.Infrastructure
         public Guid TenantId { get; set; }
 
         public TenantDto CurrentTenant { get; set; }
+
+        void ResetTenant(Guid tenantId, TenantDto tenantDto);
     }
 }

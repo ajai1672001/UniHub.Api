@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Mapster;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using UniHub.Domain.Interface;
 using UniHub.Dto;
 using UniHub.Infrastructure;
 using UniHub.Service.Services;
-using Mapster;
 
 namespace UniHub.Service
 {
@@ -15,6 +15,9 @@ namespace UniHub.Service
         {
             services.AddScoped<ITimeService, TimeService>();
             services.AddScoped<ISettingService, SettingService>();
+            services.AddScoped<ITenantService, TenantService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITenantUserService, TenantUserService>();
             return services;
         }
 

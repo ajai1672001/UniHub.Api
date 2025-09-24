@@ -8,6 +8,7 @@
             public const string Tenant = "tenant";
             public const string Identity = "identity";
         }
+
         public static class Headers
         {
             public static string Apikey = "x-api-key";

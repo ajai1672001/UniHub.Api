@@ -14,4 +14,10 @@ public class HeaderProvider : IHeaderProvider
     public TenantDto CurrentTenant { get; set; }
 
     public Guid UserId { get; set; }
+
+    public void ResetTenant(Guid tenantId, TenantDto tenantDto)
+    {
+        TenantId = tenantId;
+        CurrentTenant = tenantDto;
+    }
 }
