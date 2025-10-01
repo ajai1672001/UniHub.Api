@@ -20,6 +20,8 @@ namespace UniHub.Domain.Entities
 
         public Guid RoleId { get; set; }
 
+        public  bool IsPrimary { get; set; }
+
         public AspNetUser AspNetUser { get; set; }
 
         public AspNetRole AspNetRole { get; set; }

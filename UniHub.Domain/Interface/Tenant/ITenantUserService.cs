@@ -9,4 +9,6 @@ public interface ITenantUserService
     Task<TenantUserDto> GetTenantUserAsync(Guid id);
 
     Task<bool> GetTenantUserByUserIdAsync(Guid id, bool currentTenant = false);
+
+    Task<IEnumerable<TenantUserDto>> GetTenantUsersAsync(Guid UserId);
 }

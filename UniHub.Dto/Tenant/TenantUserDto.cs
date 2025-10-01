@@ -5,6 +5,7 @@ namespace UniHub.Dto;
 public class TenantUserDto
 {
     public Guid Id { get; set; }
+
     public string FirstName { get; set; } = string.Empty;
 
     public string LastName { get; set; } = string.Empty;
@@ -14,6 +15,8 @@ public class TenantUserDto
     public DateTime DateOfBirth { get; set; }
 
     public string TimeZone { get; set; } = string.Empty;
+    
+    public bool IsPrimary { get; set; }
 
     public Guid AspNetUserId { get; set; }
 
