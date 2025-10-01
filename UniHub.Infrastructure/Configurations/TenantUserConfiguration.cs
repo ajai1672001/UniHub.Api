@@ -37,6 +37,11 @@ namespace UniHub.Infrastructure.Configurations
                 .IsRequired();
 
             builder
+                .Property( e => e.IsPrimary )
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            builder
                 .HasOne(e => e.AspNetRole)
                 .WithMany()
                 .HasPrincipalKey(e => e.Id)

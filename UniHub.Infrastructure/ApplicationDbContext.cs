@@ -71,6 +71,19 @@ public class ApplicationDbContext : IdentityDbContext<
         {
             if (item.State == EntityState.Added)
             {
+
+                if (item.Entity != null)
+                {
+                    var tenantProperty = item.Entity.GetType().GetProperty("TenantId");
+                    if (tenantProperty != null)
+                    {
+                        var currentValue = (Guid)tenantProperty.GetValue(item.Entity);
+                        if (currentValue == Guid.Empty && tenantId != Guid.Empty)
+                        {
+                            tenantProperty.SetValue(item.Entity, tenantId);
+                        }
+                    }
+                }
                 if (tenantId != Guid.Empty)
                 {
                     if (item.Entity is IHaveBaseTenantSoftDeleteIdAuditEntityService baseOptionalTenant)

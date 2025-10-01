@@ -29,6 +29,8 @@ public class Program
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+        var appSetting = builder.Configuration.GetSection("AppSettings").Get<AppSetting>();
+
         #endregion Database Connection (Configure EF Core DbContext)
 
         #region API Explorer & Swagger (For OpenAPI Documentation) & x-apikey  & x-tenant-Id
@@ -72,7 +74,7 @@ public class Program
 
         // Register Identity
         builder.Services.AddIdentiyConfiguration();
-
+        builder.Services.AddIdentiyAuthentication(appSetting.JWT);
         #region Controllers (Traditional API Endpoints)
 
         // Registers support for MVC Controllers.

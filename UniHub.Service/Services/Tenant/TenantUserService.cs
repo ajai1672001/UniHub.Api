@@ -27,6 +27,9 @@ namespace UniHub.Service.Services
             if (tenantUser == null)
             {
                 dto.Id = Guid.NewGuid();
+                
+                dto.IsPrimary = await GetTenantUserByUserIdAsync(dto.Id);
+
                 tenantUser = dto.Adapt<TenantUser>();
                 tenantUser.AspNetUserId = aspNetUserId;
 
@@ -62,9 +65,22 @@ namespace UniHub.Service.Services
 
         public async Task<bool> GetTenantUserByUserIdAsync(Guid aspNetUserId, bool currentTenant = false)
         {
-            var tenantUser = (await _tenantUserRepository.GetAsync(e => e.AspNetUserId == aspNetUserId, !currentTenant)).FirstOrDefault();
+            var tenantUser = (await _tenantUserRepository.GetAsync(e => e.AspNetUserId == aspNetUserId, !currentTenant,true)).FirstOrDefault();
 
             return tenantUser != null;
+        }
+
+        public async Task<IEnumerable<TenantUserDto>> GetTenantUsersAsync(Guid UserId)
+        {
+            var tenantUser = (await _tenantUserRepository
+                .GetAsync(e => e.AspNetUserId == UserId)).ToList();
+
+            if (tenantUser == null)
+            {
+                throw new ApplicationException("Tenant user not found.");
+            }
+
+            return tenantUser.Adapt<IEnumerable<TenantUserDto>>();
         }
     }
 }
