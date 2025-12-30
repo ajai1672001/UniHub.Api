@@ -61,6 +61,9 @@ public class ApplicationDbContext : IdentityDbContext<
 
         modelBuilder.Entity<Tenant>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<TenantUser>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+        modelBuilder.Entity<TenantInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+        modelBuilder.Entity<SocialLink>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+        modelBuilder.Entity<SupportInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

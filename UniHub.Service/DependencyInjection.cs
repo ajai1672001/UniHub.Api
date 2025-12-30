@@ -19,6 +19,8 @@ namespace UniHub.Service
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITenantUserService, TenantUserService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ITenantSettingsService, TenantSettingsService>();
             return services;
         }
 
