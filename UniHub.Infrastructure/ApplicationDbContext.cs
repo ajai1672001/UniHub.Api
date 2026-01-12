@@ -39,6 +39,7 @@ public class ApplicationDbContext : IdentityDbContext<
         base.OnModelCreating(modelBuilder);
         ApplyConfigurations(modelBuilder);
         ConfigureEntities(modelBuilder);
+        ApplyTenantFilter(modelBuilder);
     }
 
     private void ApplyConfigurations(ModelBuilder modelBuilder)
@@ -64,6 +65,8 @@ public class ApplicationDbContext : IdentityDbContext<
         modelBuilder.Entity<TenantInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
         modelBuilder.Entity<SocialLink>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
         modelBuilder.Entity<SupportInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+        modelBuilder.Entity<SupportInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+        modelBuilder.Entity<EmailTemplate>().HasQueryFilter(e => (e.TenantId == tenantId || e.TenantId == null) && !e.IsDeleted);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

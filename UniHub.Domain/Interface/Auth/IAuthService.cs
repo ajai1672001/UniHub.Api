@@ -9,10 +9,10 @@ namespace UniHub.Domain.Interface
 {
     public interface IAuthService
     {
-        Task<LoginResultDto> LoginAsync(LoginDetailDto login);
+        Task<BaseResponse<LoginResultDto>> LoginAsync(LoginDetailDto login);
 
         Task LogoutAsync(TokenDto tokenDto);
 
-        Task<LoginResultDto> RefreshTokenAsync(TokenDto model);
+        Task<BaseResponse<LoginResultDto>> RefreshTokenAsync(TokenDto model);
     }
 }

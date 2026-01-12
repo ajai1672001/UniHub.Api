@@ -16,6 +16,8 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+  
+
         #region Serilog
 
         SerilogConfig.LogConfig();
@@ -75,6 +77,7 @@ public class Program
         // Register Identity
         builder.Services.AddIdentiyConfiguration();
         builder.Services.AddIdentiyAuthentication(appSetting.JWT);
+
         #region Controllers (Traditional API Endpoints)
 
         // Registers support for MVC Controllers.
@@ -84,6 +87,22 @@ public class Program
         builder.Services.AddHttpContextAccessor();
 
         #endregion Controllers (Traditional API Endpoints)
+
+        #region Add Core Policy
+
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("CustomPolicy", policy =>
+            {
+                policy.WithOrigins(allowedOrigins)
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+        });
+        #endregion Add Core Policy
+
 
         #region Dependency Injection (Custom Application Services)
 
@@ -127,9 +146,15 @@ public class Program
         // Error handling
         app.UseMiddleware<ErrorHandlingMiddleware>();
 
+        app.UseCors("CustomPolicy");
+
+        // Routing (If you aren't using it explicitly, UseCors handles it, 
+        app.UseRouting();
+
         // X-Apikey authentication
         app.UseMiddleware<ApiKeyMiddleware>();
         app.UseMiddleware<TenantMiddleware>();
+
 
         // Enforces HTTPS redirection for secure requests.
         app.UseHttpsRedirection();
@@ -149,6 +174,7 @@ public class Program
         app.RegisterMinimalApis();
 
         #endregion Minimal API Endpoints
+
 
         app.Run();
     }

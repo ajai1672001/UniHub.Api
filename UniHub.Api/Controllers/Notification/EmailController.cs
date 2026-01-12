@@ -7,7 +7,6 @@ using UniHub.Dto;
 namespace UniHub.Api.Controllers.Notification
 {
     [Route("api/v1/[controller]")]
-    [SkipTenantHeader]
     [ApiController]
     public class EmailController : ControllerBase
     {
@@ -21,6 +20,13 @@ namespace UniHub.Api.Controllers.Notification
         public async Task<IActionResult> SendEmailAsync([FromBody] SendEmailDto sendEmail)
         {
             await _emailService.SendEmailAsync(sendEmail);
+            return Ok();
+        }
+
+        [HttpPost("template-send")]
+        public async Task<IActionResult> SendEmailTemplateAsync([FromBody] SendEmailTemplateDto sendEmail)
+        {
+            await _emailService.SendEmailFromTemplateAsync(sendEmail);
             return Ok();
         }
     }

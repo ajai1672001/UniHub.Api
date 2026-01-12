@@ -2,9 +2,11 @@
 
 public class TokenDto
 {
-    public string RefershToken { get; set; }
+    public string RefreshToken { get; set; }
 
-    public DateTime RefershTokenExpires { get; set; }
+    public DateTime RefreshTokenExpiration { get; set; }
+
+    public DateTime AccessTokenExpiration { get; set; }
 
     public string AccessToken { get; set; }
 }

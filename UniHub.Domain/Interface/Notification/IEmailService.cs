@@ -10,5 +10,8 @@ namespace UniHub.Domain.Interface
     public interface IEmailService
     {
         Task SendEmailAsync(SendEmailDto sendEmail);
+
+        Task SendEmailFromTemplateAsync(SendEmailTemplateDto sendEmail);
+
     }
 }

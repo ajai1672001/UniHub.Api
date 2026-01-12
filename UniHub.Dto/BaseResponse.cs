@@ -15,11 +15,11 @@ namespace UniHub.Dto
         public BaseResponse()
         { }
 
-        public BaseResponse(bool isSuccess)
+        public BaseResponse(bool isSuccess,string message = "")
         {
             Code = isSuccess ? HttpStatusCode.OK : HttpStatusCode.UnprocessableEntity;
             IsSuccess = isSuccess;
-            Message = string.Empty;
+            Message = message;
             Data = default;
         }
 

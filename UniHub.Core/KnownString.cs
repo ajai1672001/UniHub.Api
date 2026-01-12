@@ -7,6 +7,7 @@
             public const string Default = "dbo";
             public const string Tenant = "tenant";
             public const string Identity = "identity";
+            public const string Email = "email";
         }
 
         public static class Headers

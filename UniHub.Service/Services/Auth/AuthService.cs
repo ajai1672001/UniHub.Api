@@ -2,15 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using UniHub.Domain.Entities;
 using UniHub.Domain.Entities.Identity;
 using UniHub.Domain.Interface;
 using UniHub.Dto;
@@ -46,19 +41,18 @@ public class AuthService : IAuthService
         _jwtSecret = configuration["AppSettings:Jwt:Key"];
     }
 
-    public async Task<LoginResultDto> LoginAsync(LoginDetailDto login)
+    public async Task<BaseResponse<LoginResultDto>> LoginAsync(LoginDetailDto login)
     {
         var user = await _userService.GetAspNetUserByEmailAsync(login.Email);
 
+        if (user == null)
+            throw new ApplicationException("User Not Found.");
+
         if (user?.EmailConfirmed == false)
-        {
             throw new ApplicationException("Email not verified");
-        }
 
         if (user?.LockoutEnd is not null)
-        {
             throw new ApplicationException("Your Account Has been locked Out");
-        }
 
         if (login.IsExternal && login.Password != "Tamil12#")
         {
@@ -74,89 +68,64 @@ public class AuthService : IAuthService
                 throw new ApplicationException("Password not matched!");
             }
         }
-        var token = await GenerateJWTTokenAsync(user);
-        var refershToken = await GetRefershTokenAsync(user.Id, token);
+        var token = await GenerateTokensAsync(user);
         var tenantUsers = await _tenantUserService.GetTenantUsersAsync(user.Id);
         var tenantUser = tenantUsers.FirstOrDefault(e => e.IsPrimary);
-        return new LoginResultDto
+        return new BaseResponse<LoginResultDto>(new LoginResultDto
         {
-            Token = token,
-            Expiration = DateTime.Now.AddMinutes(30),
-            RefershToken = refershToken.RefershToken,
-            RefershTokenExpires = refershToken.RefershTokenExpires,
+            Token = token.AccessToken,
+            Expiration = token.AccessTokenExpiration,
+            RefershToken = token.RefreshToken,
+            RefershTokenExpires = token.RefreshTokenExpiration,
             User = user.Adapt<AspNetUserDto>(),
             TenantUser = tenantUser,
             TenantUsers = tenantUsers
-        };
+        });
     }
-    public async Task<string> GenerateJWTTokenAsync(AspNetUser user)
+
+    public async Task<TokenDto> GenerateTokensAsync(AspNetUser user)
     {
         var authClaims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.PrimarySid,user.Id.ToString()),
+            new Claim(ClaimTypes.PrimarySid, user.Id.ToString()),
         };
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
 
+        // --- Access Token (Short-lived: 15-30 mins) ---
+        var accessTokenExpiration = DateTime.UtcNow.AddMinutes(1);
         var jwtSecurityToken = new JwtSecurityToken(
-        expires: DateTime.Now.AddMinutes(30),
-        claims: authClaims,
-        signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
+            expires: accessTokenExpiration,
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        );
 
-        return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+
+        // --- Refresh Token (Long-lived: 7 days) ---
+        var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        var refreshTokenExpiration = DateTime.UtcNow.AddMinutes(2);
+
+        // TODO: Save 'refreshToken' and 'refreshTokenExpiration' to your AspNetUser table in the DB here
+
+        return new TokenDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            AccessTokenExpiration = accessTokenExpiration,
+            RefreshTokenExpiration = refreshTokenExpiration
+        };
     }
 
-    private async Task<TokenDto> GetRefershTokenAsync(Guid userId, string token)
-    {
-        var refershToken = (await _refreshRepository.GetAsync(x => x.UserId == userId)).FirstOrDefault();
-
-        if (refershToken == null)
-        {
-            refershToken = new AspNetUserRefershToken()
-            {
-                UserId = userId,
-                AccessToken = token,
-                RefershToken = GenerateRefreshToken(),
-                RefershTokenExpires = DateTime.UtcNow.AddDays(7),
-                GenerateAt = DateTime.UtcNow,
-            };
-
-            await _refreshRepository.InsertAsync(refershToken);
-        }
-        else
-        {
-            refershToken.AccessToken = token;
-            refershToken.RefershToken = GenerateRefreshToken();
-            refershToken.RefershTokenExpires = DateTime.UtcNow.AddMinutes(2);
-            refershToken.GenerateAt = DateTime.UtcNow;
-
-            _refreshRepository.Update(refershToken);
-        }
-
-        await _unitOfWork.CommitAsync();
-
-        return refershToken.Adapt<TokenDto>();
-    }
-
-    private string GenerateRefreshToken()
-    {
-        var randomNumber = new byte[32];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
-        }
-    }
-
-    public async Task<LoginResultDto> RefreshTokenAsync(TokenDto refershToken)
+    public async Task<BaseResponse<LoginResultDto>> RefreshTokenAsync(TokenDto refershToken)
     {
         var token = (await _refreshRepository.GetAsync(x =>
             x.AccessToken == refershToken.AccessToken &&
-            x.RefershToken == refershToken.RefershToken
-        )).FirstOrDefault();
+            x.RefershToken == refershToken.RefreshToken ))
+            .FirstOrDefault();
 
         if (token == null)
         {
@@ -175,23 +144,24 @@ public class AuthService : IAuthService
             throw new ApplicationException("User not found !");
         }
 
+        var newtoken = await GenerateTokensAsync(user);
         var tenantUsers = await _tenantUserService.GetTenantUsersAsync(user.Id);
         var tenantUser = tenantUsers.FirstOrDefault(e => e.IsPrimary);
-
-        return new LoginResultDto
+        return new BaseResponse<LoginResultDto>(new LoginResultDto
         {
-            Token = await GenerateJWTTokenAsync(user!),
-            Expiration = DateTime.Now.AddMinutes(30),
-            RefershToken = refershToken.RefershToken,
-            RefershTokenExpires = refershToken.RefershTokenExpires,
+            Token = newtoken.AccessToken,
+            Expiration = newtoken.AccessTokenExpiration,
+            RefershToken = newtoken.RefreshToken,
+            RefershTokenExpires = newtoken.RefreshTokenExpiration,
             User = user.Adapt<AspNetUserDto>(),
             TenantUser = tenantUser,
             TenantUsers = tenantUsers
-        };
+        });
     }
+
     public async Task LogoutAsync(TokenDto tokenDto)
     {
-        var token = await _refreshRepository.GetAsync(x => x.AccessToken == tokenDto.AccessToken && x.RefershToken == tokenDto.RefershToken);
+        var token = await _refreshRepository.GetAsync(x => x.AccessToken == tokenDto.AccessToken && x.RefershToken == tokenDto.RefreshToken);
 
         if (token == null)
         {
@@ -201,6 +171,5 @@ public class AuthService : IAuthService
         _refreshRepository.BulkDelete(token);
 
         await _unitOfWork.CommitAsync();
-
     }
 }
