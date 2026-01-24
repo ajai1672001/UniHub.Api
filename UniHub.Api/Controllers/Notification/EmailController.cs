@@ -24,6 +24,7 @@ namespace UniHub.Api.Controllers.Notification
         }
 
         [HttpPost("template-send")]
+        [SkipTenantHeader]
         public async Task<IActionResult> SendEmailTemplateAsync([FromBody] SendEmailTemplateDto sendEmail)
         {
             await _emailService.SendEmailFromTemplateAsync(sendEmail);

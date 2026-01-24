@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
 using UniHub.Domain.Entities;
 using UniHub.Domain.Entities.Identity;
 using UniHub.Domain.Interface;
 using UniHub.Infrastructure.Configurations;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace UniHub.Infrastructure;
 
@@ -58,15 +59,15 @@ public class ApplicationDbContext : IdentityDbContext<
 
     private void ApplyTenantFilter(ModelBuilder modelBuilder)
     {
-        var tenantId = _headerService.TenantId;
 
         modelBuilder.Entity<Tenant>().HasQueryFilter(e => !e.IsDeleted);
-        modelBuilder.Entity<TenantUser>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-        modelBuilder.Entity<TenantInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-        modelBuilder.Entity<SocialLink>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-        modelBuilder.Entity<SupportInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-        modelBuilder.Entity<SupportInfo>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-        modelBuilder.Entity<EmailTemplate>().HasQueryFilter(e => (e.TenantId == tenantId || e.TenantId == null) && !e.IsDeleted);
+        modelBuilder.Entity<Setting>().HasQueryFilter(e => e.TenantId == _headerService.TenantId && !e.IsDeleted);
+        modelBuilder.Entity<TenantUser>().HasQueryFilter(e => e.TenantId == _headerService.TenantId && !e.IsDeleted);
+        modelBuilder.Entity<TenantInfo>().HasQueryFilter(e => e.TenantId == _headerService.TenantId && !e.IsDeleted);
+        modelBuilder.Entity<SocialLink>().HasQueryFilter(e => e.TenantId == _headerService.TenantId && !e.IsDeleted);
+        modelBuilder.Entity<SupportInfo>().HasQueryFilter(e => e.TenantId == _headerService.TenantId && !e.IsDeleted);
+        modelBuilder.Entity<SupportInfo>().HasQueryFilter(e => e.TenantId == _headerService.TenantId && !e.IsDeleted);
+        modelBuilder.Entity<EmailTemplate>().HasQueryFilter(e => (e.TenantId == _headerService.TenantId || e.TenantId == null) && !e.IsDeleted);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -182,4 +183,9 @@ public class ApplicationDbContext : IdentityDbContext<
     public DbSet<AspNetUserRole> AspNetUserRole { get; set; }
     public DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
     public DbSet<UserOtp> UserOtps { get; set; }
+    public DbSet<Setting> Settings { get; set; }
+
+    public DbSet<EmailLog> EmailLogs { get; set; }
+    public DbSet<EmailTemplate> EmailTemplates{ get; set; }
+    public DbSet<EmailReciever> EmailRecievers { get; set; }
 }

@@ -14,11 +14,17 @@ namespace UniHub.Api.Controllers
         {
             _settingService = settingService;
         }
+
         [HttpPost]
         public async Task<IActionResult> SaveSettingAsync([FromBody] SettingDto dto)
         {
-            await _settingService.SaveSettingAsync(dto);
-            return Ok();
+            return Ok(await _settingService.SaveSettingAsync(dto));
+        }
+
+        [HttpGet("list")]
+        public async Task<IActionResult> GetSettingByNameAsync([FromQuery] string name )
+        {
+            return Ok(await _settingService.GetSettingByNameAsync(name));
         }
     }
 }

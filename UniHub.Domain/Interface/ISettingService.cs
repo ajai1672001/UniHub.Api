@@ -9,6 +9,8 @@ namespace UniHub.Domain.Interface
 {
     public interface ISettingService
     {
-        Task SaveSettingAsync(SettingDto dto);
+        Task<BaseResponse<string>> SaveSettingAsync(SettingDto dto);
+
+        Task<BaseResponse<IEnumerable<SettingDto>>> GetSettingByNameAsync(string name);
     }
 }

@@ -8,7 +8,7 @@ using UniHub.Domain.Interface;
 using UniHub.Dto;
 
 [ApiController]
-[Route("api/tenant-info")]
+[Route("api/v1/tenant-info")]
 public class TenantInfoController : ControllerBase
 {
     private readonly ITenantSettingsService _settingsService;

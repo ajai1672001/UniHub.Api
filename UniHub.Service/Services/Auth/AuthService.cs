@@ -22,6 +22,8 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<AspNetUser> _userManager;
     private readonly ITenantUserService _tenantUserService;
+    private readonly int _refreshTokenExpirationDays;
+    private readonly int _accessTokenExpirationMinutes;
 
     public AuthService(
         IUserService userService,
@@ -39,6 +41,8 @@ public class AuthService : IAuthService
         _userManager = userManager;
         _tenantUserService = tenantUserService;
         _jwtSecret = configuration["AppSettings:Jwt:Key"];
+        _refreshTokenExpirationDays = configuration.GetSection("AppSettings:Jwt:RefreshTokenExpirationDays").Get<int>();
+        _accessTokenExpirationMinutes = configuration.GetSection("AppSettings:Jwt:AccessTokenExpirationMinutes").Get<int>();
     }
 
     public async Task<BaseResponse<LoginResultDto>> LoginAsync(LoginDetailDto login)
@@ -96,7 +100,7 @@ public class AuthService : IAuthService
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
 
         // --- Access Token (Short-lived: 15-30 mins) ---
-        var accessTokenExpiration = DateTime.UtcNow.AddMinutes(1);
+        var accessTokenExpiration = DateTime.UtcNow.AddMinutes(_accessTokenExpirationMinutes);
         var jwtSecurityToken = new JwtSecurityToken(
             expires: accessTokenExpiration,
             claims: authClaims,
@@ -107,7 +111,7 @@ public class AuthService : IAuthService
 
         // --- Refresh Token (Long-lived: 7 days) ---
         var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-        var refreshTokenExpiration = DateTime.UtcNow.AddMinutes(2);
+        var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpirationDays);
 
         // TODO: Save 'refreshToken' and 'refreshTokenExpiration' to your AspNetUser table in the DB here
 

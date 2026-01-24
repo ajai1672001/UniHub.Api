@@ -5,16 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using UniHub.Core.Enum;
 
-namespace UniHub.Domain.Entities
+namespace UniHub.Dto
 {
-    public class EmailLog : BaseSoftDeleteIdEntity<Guid>
+    public class EmailLogDto
     {
-        public string Content { get; set; }
 
         public EmailStatusEnum Status { get; set; }
 
         public string ErrorMessage { get; set; }
 
-        public ICollection<EmailReciever> EmailRecivers { get; set; }
+        public string Email { get; set; }
+
+        public DateTime SendDate { get; set; }
     }
 }

@@ -2,10 +2,8 @@
 
 namespace UniHub.Dto;
 
-public class TenantUserDto
+public class TenantUserDto:BaseTenantSoftDeleteIdAuditDto<Guid>
 {
-    public Guid Id { get; set; }
-
     public string FirstName { get; set; } = string.Empty;
 
     public string LastName { get; set; } = string.Empty;

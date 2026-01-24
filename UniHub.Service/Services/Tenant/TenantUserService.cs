@@ -73,7 +73,7 @@ namespace UniHub.Service.Services
         public async Task<IEnumerable<TenantUserDto>> GetTenantUsersAsync(Guid UserId)
         {
             var tenantUser = (await _tenantUserRepository
-                .GetAsync(e => e.AspNetUserId == UserId)).ToList();
+                .GetAsync(e => e.AspNetUserId == UserId,true)).ToList();
 
             if (tenantUser == null)
             {
