@@ -25,5 +25,4 @@ public class BaseAuditDto : BaseDto
 
 public class BaseDto
 {
-    public byte[] RowVersion { get; set; }
 }

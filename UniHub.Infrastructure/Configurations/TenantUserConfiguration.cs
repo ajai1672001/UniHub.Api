@@ -12,24 +12,6 @@ namespace UniHub.Infrastructure.Configurations
         {
             builder.ToTable("TenantUsers", Schema.Tenant);
 
-            builder
-                .Property(e => e.FirstName)
-                .HasMaxLength(50)
-                .IsRequired();
-
-            builder
-                .Property(e => e.LastName)
-                .HasMaxLength(50)
-                .IsRequired();
-
-            builder
-                .Property(e => e.Gender)
-                .HasDefaultValue(GenderEnum.NotSpecified)
-                .IsRequired();
-
-            builder
-                .Property(e => e.DateOfBirth)
-                .IsRequired();
 
             builder
                 .Property(e => e.TimeZone)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using UniHub.Core.Enum;
 using UniHub.Domain.Interface;
 
 namespace UniHub.Domain.Entities.Identity;
@@ -8,6 +9,14 @@ public class AspNetUser : IdentityUser<Guid>,
     IHaveBaseSoftDeleteService,
     IHaveBaseEntitySerivce
 {
+    public string FirstName { get; set; } = string.Empty;
+
+    public string LastName { get; set; } = string.Empty;
+
+    public GenderEnum Gender { get; set; }
+
+    public DateTime DateOfBirth { get; set; }
+
     public bool IsDeleted { get; set; }
 
     public DateTime DateCreated { get; set; }

@@ -6,13 +6,19 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace UniHub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class _init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "identity");
+
+            migrationBuilder.EnsureSchema(
+                name: "email");
+
+            migrationBuilder.EnsureSchema(
+                name: "dbo");
 
             migrationBuilder.EnsureSchema(
                 name: "tenant");
@@ -73,7 +79,6 @@ namespace UniHub.Infrastructure.Migrations
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Gender = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TimeZone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -98,6 +103,28 @@ namespace UniHub.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailLogs",
+                schema: "email",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailLogs", x => x.Id);
+                    table.CheckConstraint("CK_EmailLogs_Status", "[Status] IN (0, 1)");
                 });
 
             migrationBuilder.CreateTable(
@@ -276,6 +303,8 @@ namespace UniHub.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Otp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AspNetUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -295,12 +324,198 @@ namespace UniHub.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EmailReciever",
+                schema: "email",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EmailLogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailReciever", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailReciever_EmailLogs_EmailLogId",
+                        column: x => x.EmailLogId,
+                        principalSchema: "email",
+                        principalTable: "EmailLogs",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailTemplates",
+                schema: "email",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Body = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DefaultEmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailTemplates", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmailTemplates_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalSchema: "tenant",
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Settings",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Settings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Settings_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalSchema: "tenant",
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SocialLinks",
+                schema: "tenant",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Platform = table.Column<int>(type: "int", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SocialLinks", x => x.Id)
+                        .Annotation("SqlServer:Clustered", false);
+                    table.CheckConstraint("CK_SocialLinks_Platform", "Platform IN (0, 1, 2, 3, 4, 5)");
+                    table.ForeignKey(
+                        name: "FK_SocialLinks_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalSchema: "tenant",
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SupportInfos",
+                schema: "tenant",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SupportEmail = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    SupportPhone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    WorkingHours = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SupportInfos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SupportInfos_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalSchema: "tenant",
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TenantInfos",
+                schema: "tenant",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContactName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    AlternatePhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    AddressLine1 = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    AddressLine2 = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    State = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    PostalCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    AboutUs = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Vision = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Mission = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    WebsiteUrl = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TenantInfos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TenantInfos_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalSchema: "tenant",
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TenantUsers",
                 schema: "tenant",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TimeZone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     AspNetUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsPrimary = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -312,6 +527,12 @@ namespace UniHub.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TenantUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TenantUsers_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "identity",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TenantUsers_AspNetUsers_AspNetUserId",
                         column: x => x.AspNetUserId,
@@ -429,6 +650,93 @@ namespace UniHub.Infrastructure.Migrations
                 .Annotation("SqlServer:Clustered", false);
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmailLogs_IsDeleted",
+                schema: "email",
+                table: "EmailLogs",
+                column: "IsDeleted")
+                .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailReciever_EmailLogId",
+                schema: "email",
+                table: "EmailReciever",
+                column: "EmailLogId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailReciever_IsDeleted",
+                schema: "email",
+                table: "EmailReciever",
+                column: "IsDeleted")
+                .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailTemplates_IsDeleted",
+                schema: "email",
+                table: "EmailTemplates",
+                column: "IsDeleted")
+                .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailTemplates_TenantId",
+                schema: "email",
+                table: "EmailTemplates",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Settings_IsDeleted",
+                schema: "dbo",
+                table: "Settings",
+                column: "IsDeleted")
+                .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Settings_TenantId",
+                schema: "dbo",
+                table: "Settings",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SocialLinks_IsDeleted",
+                schema: "tenant",
+                table: "SocialLinks",
+                column: "IsDeleted")
+                .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SocialLinks_TenantId_Id",
+                schema: "tenant",
+                table: "SocialLinks",
+                columns: new[] { "TenantId", "Id" })
+                .Annotation("SqlServer:Clustered", true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportInfos_IsDeleted",
+                schema: "tenant",
+                table: "SupportInfos",
+                column: "IsDeleted")
+                .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportInfos_TenantId",
+                schema: "tenant",
+                table: "SupportInfos",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TenantInfos_IsDeleted",
+                schema: "tenant",
+                table: "TenantInfos",
+                column: "IsDeleted")
+                .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TenantInfos_TenantId",
+                schema: "tenant",
+                table: "TenantInfos",
+                column: "TenantId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tenants_IsDeleted",
                 schema: "tenant",
                 table: "Tenants",
@@ -447,6 +755,12 @@ namespace UniHub.Infrastructure.Migrations
                 table: "TenantUsers",
                 column: "IsDeleted")
                 .Annotation("SqlServer:Clustered", false);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TenantUsers_RoleId",
+                schema: "tenant",
+                table: "TenantUsers",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TenantUsers_TenantId",
@@ -496,12 +810,40 @@ namespace UniHub.Infrastructure.Migrations
                 schema: "identity");
 
             migrationBuilder.DropTable(
+                name: "EmailReciever",
+                schema: "email");
+
+            migrationBuilder.DropTable(
+                name: "EmailTemplates",
+                schema: "email");
+
+            migrationBuilder.DropTable(
+                name: "Settings",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "SocialLinks",
+                schema: "tenant");
+
+            migrationBuilder.DropTable(
+                name: "SupportInfos",
+                schema: "tenant");
+
+            migrationBuilder.DropTable(
+                name: "TenantInfos",
+                schema: "tenant");
+
+            migrationBuilder.DropTable(
                 name: "TenantUsers",
                 schema: "tenant");
 
             migrationBuilder.DropTable(
                 name: "UserOtps",
                 schema: "identity");
+
+            migrationBuilder.DropTable(
+                name: "EmailLogs",
+                schema: "email");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles",

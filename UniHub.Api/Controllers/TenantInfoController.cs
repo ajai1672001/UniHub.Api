@@ -39,7 +39,7 @@ public class TenantInfoController : ControllerBase
 
         await _settingsService.SaveOrUpdateAsync( dto);
 
-        return Ok(new BaseResponse<object>( new { message = "Settings saved successfully." }));
+        return Ok(BaseResponse<object>.Success( new { message = "Settings saved successfully." }));
     }
 
 }

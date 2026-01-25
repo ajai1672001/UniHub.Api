@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Serilog;
 using UniHub.Api.Extension;
 using UniHub.Api.Extension.Middleware;
@@ -47,7 +47,7 @@ public class Program
             {
                 Description = "API Key needed to access the endpoints. Use: `x-api-key: {your_key}`",
                 Type = SecuritySchemeType.ApiKey,
-                Name = KnownString.Headers.Apikey,        // 👈 header name
+                Name = KnownString.Headers.Apikey,
                 In = ParameterLocation.Header,
                 Scheme = "ApiKeyScheme"
             });
@@ -57,11 +57,16 @@ public class Program
                 {
                     new OpenApiSecurityScheme
                     {
+                        Scheme = "ApiKeyScheme",
+                        Name = KnownString.Headers.Apikey,
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.ApiKey,
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
                             Id = "ApiKey"
-                        }
+                        },
+                        
                     },
                     Array.Empty<string>()
                 }

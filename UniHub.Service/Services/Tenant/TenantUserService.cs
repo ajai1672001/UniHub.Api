@@ -37,10 +37,6 @@ namespace UniHub.Service.Services
             }
             else
             {
-                tenantUser.FirstName = dto.FirstName;
-                tenantUser.LastName = dto.LastName;
-                tenantUser.Gender = dto.Gender;
-                tenantUser.DateOfBirth = dto.DateOfBirth;
                 tenantUser.TimeZone = dto.TimeZone;
 
                 _tenantUserRepository.Update(tenantUser);

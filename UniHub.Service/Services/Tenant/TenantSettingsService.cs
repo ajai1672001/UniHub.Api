@@ -68,7 +68,7 @@ public class TenantSettingsService : ITenantSettingsService
             IsActive = x.IsActive
         }).ToList();
 
-        return new BaseResponse<TenantInfoDto>(dto);
+        return BaseResponse<TenantInfoDto>.Success(dto);
     }
 
     // ---------------- SAVE OR UPDATE ----------------

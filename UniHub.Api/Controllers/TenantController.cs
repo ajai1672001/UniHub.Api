@@ -21,9 +21,7 @@ namespace UniHub.Api.Controllers
         [SkipTenantHeader]
         public async Task<IActionResult> SignupTenantAsync([FromBody] TenantSignupDto tenantSignup)
         {
-                var result = await _tenantService.SignUpTenantAsync(tenantSignup);
-
-                return Ok(new BaseResponse<TenantSignupDto>(result));
+                return Ok(await _tenantService.SignUpTenantAsync(tenantSignup));
            
         }
     }

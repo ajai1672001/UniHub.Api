@@ -6,14 +6,6 @@ namespace UniHub.Domain.Entities
 {
     public class TenantUser : BaseTenantSoftDeleteIdAuditEntity<Guid>, IHaveUserIdEntityService
     {
-        public string FirstName { get; set; } = string.Empty;
-
-        public string LastName { get; set; } = string.Empty;
-
-        public GenderEnum Gender { get; set; }
-
-        public DateTime DateOfBirth { get; set; }
-
         public string TimeZone { get; set; }
 
         public Guid AspNetUserId { get; set; }

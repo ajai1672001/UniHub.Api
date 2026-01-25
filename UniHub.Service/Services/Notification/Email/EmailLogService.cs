@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using UniHub.Core.Enum;
 using UniHub.Domain.Entities;
 using UniHub.Domain.Interface;
@@ -68,18 +68,13 @@ namespace UniHub.Service.Services
                 })
                 .ToListAsync();
 
-            return new BaseResponse<PaginationResultDto<EmailLogDto>>
-            {
-                Code = System.Net.HttpStatusCode.OK,
-                IsSuccess = true,
-                Message = "Email logs retrieved successfully.",
-                Data = new PaginationResultDto<EmailLogDto>
+            return BaseResponse<PaginationResultDto<EmailLogDto>>.Success(
+                new PaginationResultDto<EmailLogDto>
                 {
                     TotalCount = emailLogCount,
                     Count = emailLogs.Count,
                     Result = emailLogs
-                }
-            };
+                });
         }
     }
 }

@@ -75,7 +75,7 @@ public class AuthService : IAuthService
         var token = await GenerateTokensAsync(user);
         var tenantUsers = await _tenantUserService.GetTenantUsersAsync(user.Id);
         var tenantUser = tenantUsers.FirstOrDefault(e => e.IsPrimary);
-        return new BaseResponse<LoginResultDto>(new LoginResultDto
+        return BaseResponse<LoginResultDto>.Success(new LoginResultDto
         {
             Token = token.AccessToken,
             Expiration = token.AccessTokenExpiration,
@@ -151,7 +151,7 @@ public class AuthService : IAuthService
         var newtoken = await GenerateTokensAsync(user);
         var tenantUsers = await _tenantUserService.GetTenantUsersAsync(user.Id);
         var tenantUser = tenantUsers.FirstOrDefault(e => e.IsPrimary);
-        return new BaseResponse<LoginResultDto>(new LoginResultDto
+        return BaseResponse<LoginResultDto>.Success(new LoginResultDto
         {
             Token = newtoken.AccessToken,
             Expiration = newtoken.AccessTokenExpiration,

@@ -16,5 +16,17 @@
             public static string Tenant = "x-tenant-id";
             public static string Authorization = "Authorization";
         }
+        public static class EmailPlaceholders
+        {
+            public const string UserName = "[UserName]";
+            public const string AppName = "[AppName]";
+            public const string Otp = "[Otp]";
+            public const string OtpExpiryMinutes = "[OtpExpiryMinutes]";
+            public const string VerificationCode = "[VerificationCode]";
+            public const string CodeExpiryMinutes = "[CodeExpiryMinutes]";
+            public const string CopyRightYear = "[CopyRightYear]";
+            public const string SupportEmail = "[SupportEmail]";
+        }
+
     }
 }

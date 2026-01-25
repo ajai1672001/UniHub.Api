@@ -38,6 +38,13 @@ public class ApplicationDbContext : IdentityDbContext<
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        var passkeyType = modelBuilder.Model.GetEntityTypes().FirstOrDefault(e => e.ClrType.Name == "IdentityPasskeyData");
+        if (passkeyType != null)
+        {
+             modelBuilder.Ignore(passkeyType.ClrType);
+        }
+
         ApplyConfigurations(modelBuilder);
         ConfigureEntities(modelBuilder);
         ApplyTenantFilter(modelBuilder);

@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Identity;
+using UniHub.Domain.Entities;
 using UniHub.Domain.Entities.Identity;
 using UniHub.Domain.Interface;
 using UniHub.Dto;
@@ -43,7 +44,15 @@ namespace UniHub.Service.Services
                 result = (await _userManager.CreateAsync(user, aspNetUser.Password))
                     .Adapt<AspNetUserDto>();
             }
-            var userId = result.Id == Guid.Empty ? user.Id : result.Id;
+            else
+            {
+
+                user.FirstName = aspNetUser.FirstName;
+                user.LastName = aspNetUser.LastName;
+                user.Gender = aspNetUser.Gender;
+                user.DateOfBirth = aspNetUser.DateOfBirth;
+            }
+                var userId = result.Id == Guid.Empty ? user.Id : result.Id;
             
             result.TenantUser = await _tenantUserService.SaveTenantUserAsync(aspNetUser.TenantUser, userId);
 

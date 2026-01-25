@@ -6,6 +6,8 @@ namespace UniHub.Domain.Entities.Identity
     {
         public string Otp { get; set; }
         public Guid AspNetUserId { get; set; }
+        public DateTime ExpiryTime { get; set; }
+        public bool IsUsed { get; set; }
         public AspNetUser AspNetUser { get; set; }
     }
 }

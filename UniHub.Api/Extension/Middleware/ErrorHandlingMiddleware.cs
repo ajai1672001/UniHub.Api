@@ -50,30 +50,24 @@ namespace UniHub.Api.Extension.Middleware
         }
 
         private async Task HandleExceptionAsync(HttpContext context, Exception ex,
-    HttpStatusCode code, string message = "", dynamic? data = null)
+           HttpStatusCode code, string message = "", object? data = null)
         {
-            // 🔹 log to Serilog
             Serilog.Log.ForContext("LogType", "Error")
-                       .Error(ex, "Unhandled exception caught by middleware. " + ex.Message);
+                .Error(ex, "Unhandled exception caught by middleware. " + ex.Message);
 
             _logger.LogError(ex, message);
 
             if (!context.Response.HasStarted)
             {
-                context.Response.Clear(); // clear headers + body if something was written
+                context.Response.Clear();
                 context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                context.Response.StatusCode = (int)code;
             }
 
-            var errorResponse = new BaseResponse<dynamic>
-            {
-                Code = code,
-                Message = message,
-                Data = data,
-                IsSuccess = false
-            };
+            var errorResponse = BaseResponse<object>.FailWithData(message, data, code);
 
             await context.Response.WriteAsJsonAsync(errorResponse);
         }
+
     }
 }
