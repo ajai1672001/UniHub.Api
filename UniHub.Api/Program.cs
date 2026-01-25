@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 using UniHub.Api.Extension;
 using UniHub.Api.Extension.Middleware;
 using UniHub.Api.Extenstion;
@@ -15,8 +17,6 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-  
 
         #region Serilog
 
@@ -57,16 +57,11 @@ public class Program
                 {
                     new OpenApiSecurityScheme
                     {
-                        Scheme = "ApiKeyScheme",
-                        Name = KnownString.Headers.Apikey,
-                        In = ParameterLocation.Header,
-                        Type = SecuritySchemeType.ApiKey,
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
                             Id = "ApiKey"
                         },
-                        
                     },
                     Array.Empty<string>()
                 }
@@ -74,8 +69,6 @@ public class Program
 
             options.OperationFilter<TenantHeaderOperationFilter>();
         });
-
-
 
         #endregion API Explorer & Swagger (For OpenAPI Documentation) & x-apikey  & x-tenant-Id
 
@@ -106,8 +99,8 @@ public class Program
                       .AllowAnyMethod();
             });
         });
-        #endregion Add Core Policy
 
+        #endregion Add Core Policy
 
         #region Dependency Injection (Custom Application Services)
 
@@ -134,15 +127,13 @@ public class Program
 
         // Enables Swagger UI only in Development mode.
         // Provides a web-based interface for API testing & documentation.
-        if (app.Environment.IsDevelopment())
+
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "UniHub API V1");
-                c.RoutePrefix = "swagger"; // API docs available at /swagger/index.html
-            });
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "UniHub API V1");
+            c.RoutePrefix = "swagger"; // API docs available at /swagger/index.html
+        });
 
         #endregion Swagger Middleware (Development Only)
 
@@ -153,18 +144,19 @@ public class Program
 
         app.UseCors("CustomPolicy");
 
-        // Routing (If you aren't using it explicitly, UseCors handles it, 
+        // Routing (If you aren't using it explicitly, UseCors handles it,
         app.UseRouting();
 
         // X-Apikey authentication
         app.UseMiddleware<ApiKeyMiddleware>();
         app.UseMiddleware<TenantMiddleware>();
 
-
         // Enforces HTTPS redirection for secure requests.
         app.UseHttpsRedirection();
 
         // Adds Authorization middleware (for role/claim-based security).
+        app.UseAuthentication();
+
         app.UseAuthorization();
 
         // Maps controllers to their routes.
@@ -179,7 +171,6 @@ public class Program
         app.RegisterMinimalApis();
 
         #endregion Minimal API Endpoints
-
 
         app.Run();
     }

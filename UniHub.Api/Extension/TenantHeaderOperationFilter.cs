@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using UniHub.Core;
 
@@ -13,7 +14,7 @@ public class TenantHeaderOperationFilter : IOperationFilter
             Name = KnownString.Headers.Tenant,
             In = ParameterLocation.Header,
             Required = false, // Set to true if required
-            Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "uuid" }
+            Schema = new OpenApiSchema { Type = "string", Format = "uuid" }
         });
     }
 }

@@ -16,17 +16,29 @@ public class ApiKeyMiddleware
     {
         if (!context.Request.Headers.TryGetValue(APIKEY_HEADER, out var extractedApiKey))
         {
-            throw new UnauthorizedAccessException("API Key was not provided.");
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("API Key was not provided.");
+            return;
         }
 
-        var configuredKey = _configuration.GetValue<string>("AppSettings:ApiKey");
+        var configuredKey = _configuration["AppSettings:ApiKey"];
+
+        if (string.IsNullOrEmpty(configuredKey))
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync("API Key configuration missing.");
+            return;
+        }
 
         if (!string.Equals(extractedApiKey, configuredKey))
         {
-            throw new UnauthorizedAccessException("API Key was not valid.");
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("API Key was not valid.");
+            return;
         }
 
         await _next(context);
     }
+
 }
 
